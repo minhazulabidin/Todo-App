@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getDatabase, onValue, push, ref, set } from 'firebase/database';
+import { getDatabase, onValue, push, ref, remove, set } from 'firebase/database';
 
 const App = () => {
   const [message, setMessage] = useState({
@@ -47,12 +47,16 @@ const App = () => {
     onValue(taskCountRef, (snapshot) => {
       const array = [];
       snapshot.forEach((item) => {
-        array.push(item.val());
+        array.push({ ...item.val(), id: item.key });
       });
 
       setTodos(array);
     });
   }, []);
+
+  const handleRemove = (id) => {
+    remove(ref(db, "TaskList/" + id))
+  }
 
   return (
     <div className="w-full flex items-center justify-center bg-teal-lightest font-sans">
@@ -80,11 +84,12 @@ const App = () => {
           {todos.map((todo, index) => (
             <div key={index} className="flex mb-4 items-center">
               <p className="w-full text-grey-darkest">{todo.name}</p>
-              <button className="flex-no-shrink p-2 ml-4 mr-2 border-2 rounded text-green border-green hover:bg-green">
+              <button className="flex-no-shrink p-2 ml-4 mr-2 border-2 rounded text-green-500 border-green hover:bg-green-500 hover:text-white">
                 Done
               </button>
               <button
-                className="flex-no-shrink p-2 ml-2 border-2 rounded text-red border-red hover:bg-red"
+                className="flex-no-shrink p-2 ml-2 border-2 rounded text-red border-red-500 hover:bg-red-500 duration-200 hover:text-white"
+                onClick={() => handleRemove(todo.id)}
               >
                 Remove
               </button>
