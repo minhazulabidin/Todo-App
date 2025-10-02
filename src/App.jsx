@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { getDatabase, push, ref, set } from "firebase/database";
+import React, { useEffect, useState } from 'react'
+import { getDatabase, onValue, push, ref, set} from "firebase/database";
 
 const App = () => {
   const [message, setMessage] = useState({
@@ -19,7 +19,7 @@ const App = () => {
   const handleSubmit = () => {
     if (message.task) {
       const db = getDatabase()
-      set(push(ref(db, "TaskList")), {
+      set(push(ref(db, "TaskList/")), {
         name: message.task
       }).then(() => {
         alert("success")
@@ -32,6 +32,15 @@ const App = () => {
       }))
     }
   }
+
+  useEffect(() => {
+    const db = getDatabase();
+    const taskCountRef = ref(db, "TaskList/")
+    onValue(taskCountRef, (ss) => {
+      const data = ss.val()
+
+    })
+  }, [])
 
   return (
     <div className="h-100 w-full flex items-center justify-center bg-teal-lightest font-sans">
