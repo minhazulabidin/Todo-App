@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getDatabase, onValue, push, ref, remove, set } from 'firebase/database';
+import { useNavigate } from 'react-router';
 
 const App = () => {
   const [message, setMessage] = useState({
@@ -7,6 +8,7 @@ const App = () => {
     error: "",
   });
   const [todos, setTodos] = useState([]);
+  const navigate = useNavigate()
   const db = getDatabase();
 
   const handleInput = (e) => {
@@ -58,8 +60,11 @@ const App = () => {
     remove(ref(db, "TaskList/" + id))
   }
 
+  const handleEdit = (todo) => {
+    navigate(`/edit/${todo.id}`, { state: todo })
+  }
   return (
-    <div className="w-full flex items-center justify-center bg-teal-lightest font-sans">
+    <div className="w-full flex items-center justify-center bg-teal-lightest min-h-screen">
       <div className="bg-white rounded shadow p-6 m-4 w-full lg:w-3/4 lg:max-w-lg">
         <div className="mb-4">
           <h1 className="text-grey-darkest">Todo List</h1>
@@ -72,7 +77,7 @@ const App = () => {
               value={message.task}
             />
             <button
-              className="flex-no-shrink p-2 border-2 rounded text-teal border-teal hover:bg-teal"
+              className="flex-no-shrink p-2 border-2 rounded text-teal-500 border-teal-500 hover:bg-teal-500 hover:text-black"
               onClick={handleSubmit}
             >
               Add
@@ -80,12 +85,15 @@ const App = () => {
           </div>
           {message.error && <p className="text-red-600 mt-2">{message.error}</p>}
         </div>
-        <div className="h-[400px] overflow-y-scroll">
+        <div className="max-h-[400px] overflow-y-scroll">
           {todos.map((todo, index) => (
             <div key={index} className="flex mb-4 items-center">
               <p className="w-full text-grey-darkest">{todo.name}</p>
-              <button className="flex-no-shrink p-2 ml-4 mr-2 border-2 rounded text-green-500 border-green hover:bg-green-500 hover:text-white">
-                Done
+              <button
+                className="flex-no-shrink p-2 ml-4 mr-2 border-2 rounded text-green-500 border-green hover:bg-green-500 hover:text-white"
+                onClick={() => handleEdit(todo)}
+              >
+                Edit
               </button>
               <button
                 className="flex-no-shrink p-2 ml-2 border-2 rounded text-red border-red-500 hover:bg-red-500 duration-200 hover:text-white"
